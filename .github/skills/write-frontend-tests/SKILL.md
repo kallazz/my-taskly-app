@@ -31,19 +31,21 @@ description: Conventions for writing Vitest and React Testing Library unit tests
 
 ## Testing hooks that use React Query
 
-Use a real `QueryClient` with a wrapper, and mock only the API:
+Use a real `QueryClient` from the shared helper (retries off), and mock only the API module:
 
-```tsx
-function setup() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
-  )
-  return { client, wrapper }
-}
+```ts
+import { createQueryWrapper } from '../../../test/queryClientWrapper'
+
+vi.mock('../api/todos', () => ({ todosApi: { create: vi.fn() } }))
+
+const { client, wrapper } = createQueryWrapper()
+client.setQueryData(todoKeys.list, [todoFixture])
+const { result } = renderHook(() => useCreateTodoMutation(), { wrapper })
+await result.current.mutateAsync(input)
+expect(client.getQueryData(todoKeys.list)).toEqual([...])
 ```
 
-A file that contains JSX must be `.test.tsx`. Assert on the cache (`client.getQueryData(todoKeys.list)`) after `await result.current.mutateAsync(...)`, and wrap state updates with `waitFor`.
+Seed and assert the cache with `client.setQueryData` and `getQueryData`. Use `waitFor` for query state (`isSuccess`, `isError`). The existing `src/features/todos/hooks/*.test.tsx` files are the reference.
 
 ## Components
 
