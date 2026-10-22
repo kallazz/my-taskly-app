@@ -95,13 +95,15 @@ jobs:
             gh api "$COMMENTS" -F body=@report/comment.md > /dev/null
           fi
 
-  # Asks the Copilot cloud agent for tests. Never re-requested for the agent's own pushes.
+  # Asks the Copilot cloud agent for tests. Never re-requested for the agent's own pushes: github.actor
+  # comes from GitHub, so code in the pull request cannot fake it, unlike the verify job's outputs.
   request-tests:
     name: Request tests from the Copilot agent
     needs: verify
     if: >-
       ${{ !cancelled() && needs.verify.outputs.needs_agent == 'true' && needs.verify.outputs.head_by_agent == 'false'
-      && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository }}
+      && github.actor != 'Copilot' && !github.event.pull_request.draft
+      && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
