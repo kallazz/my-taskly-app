@@ -13,3 +13,7 @@ def validate_patch_fields(model: Model) -> Model:
         if getattr(model, field) is None:
             raise ValueError(f"Field {field} cannot be null.")
     return model
+
+
+def is_blank(value: str) -> bool:
+    return not value.strip()
