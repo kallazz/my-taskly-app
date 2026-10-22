@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.features.todos.schemas import TodoUpdate
-from app.features.todos.validators import is_blank, validate_patch_fields
+from app.features.todos.validators import is_blank, normalize_title, validate_patch_fields
 
 
 def test_rejects_an_empty_patch():
@@ -44,3 +44,16 @@ def test_is_blank_returns_true_for_empty_or_whitespace_only_strings(value):
 @pytest.mark.parametrize("value", ["a", " a ", "0", "False", "\ntext\t"])
 def test_is_blank_returns_false_when_any_non_whitespace_character_is_present(value):
     assert is_blank(value) is False
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Write tests", "Write tests"),
+        ("  Write tests  ", "Write tests"),
+        ("Write   tests", "Write tests"),
+        ("Write \t tests\nnow", "Write tests now"),
+    ],
+)
+def test_normalize_title_collapses_internal_whitespace_and_trims_edges(value, expected):
+    assert normalize_title(value) == expected
