@@ -110,7 +110,7 @@ it('wires the query, filters and notice into the page', () => {
   render(<TodosPage />)
   expect(useTodoFilters).toHaveBeenCalledWith([todoFixture])
   expect(lastProps(TodosHeader)).toEqual(
-    expect.objectContaining({ disabled: false }),
+    expect.objectContaining({ disabled: false, completed: 0, total: 1 }),
   )
   expect(lastProps(TodoFilters)).toEqual({
     filter: 'all',
@@ -140,10 +140,22 @@ it('treats missing data as an empty list while loading', () => {
   render(<TodosPage />)
   expect(useTodoFilters).toHaveBeenCalledWith([])
   expect(lastProps(TodosHeader)).toEqual(
-    expect.objectContaining({ disabled: true }),
+    expect.objectContaining({ disabled: true, completed: 0, total: 0 }),
   )
   expect(lastProps(TodoList)).toEqual(
     expect.objectContaining({ hasTodos: false, loading: true }),
+  )
+})
+
+it('passes completed and total counts to the header', () => {
+  mockPage({
+    query: {
+      data: [todoFixture, { ...todoFixture, id: 8, completed: true }],
+    },
+  })
+  render(<TodosPage />)
+  expect(lastProps(TodosHeader)).toEqual(
+    expect.objectContaining({ completed: 1, total: 2 }),
   )
 })
 

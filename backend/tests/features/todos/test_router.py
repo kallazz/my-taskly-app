@@ -1,6 +1,6 @@
 import pytest
 
-from app.features.todos.schemas import TodoCreate, TodoUpdate
+from app.features.todos.schemas import TodoCreate, TodoStats, TodoUpdate
 
 
 def test_list_returns_tasks_from_repository(client, repository_mock, todo):
@@ -19,6 +19,14 @@ def test_create_trims_input_and_returns_created_task(client, repository_mock, to
     repository_mock.create.assert_called_once_with(
         TodoCreate(title="Plan the sprint", priority="high")
     )
+
+
+def test_stats_returns_repository_counts(client, repository_mock):
+    repository_mock.stats.return_value = TodoStats(total=6, completed=4)
+    response = client.get("/api/todos/stats")
+    assert response.status_code == 200
+    assert response.json() == {"total": 6, "completed": 4}
+    repository_mock.stats.assert_called_once_with()
 
 
 @pytest.mark.parametrize("payload", [

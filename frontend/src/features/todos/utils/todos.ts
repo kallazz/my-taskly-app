@@ -56,6 +56,10 @@ export function selectTodos(
     })
 }
 
+export function countCompleted(todos: Todo[]): number {
+  return todos.filter((todo) => todo.completed).length
+}
+
 export function isOverdue(todo: Todo): boolean {
   const today = new Date()
   const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`

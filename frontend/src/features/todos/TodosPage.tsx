@@ -12,6 +12,7 @@ import { useTodosBusy } from './hooks/useTodosBusy'
 import { useTodosQuery } from './hooks/useTodosQuery'
 import { useUpdateTodoMutation } from './hooks/useUpdateTodoMutation'
 import type { Todo } from './types'
+import { countCompleted } from './utils/todos'
 
 export function TodosPage() {
   const todosQuery = useTodosQuery()
@@ -50,6 +51,8 @@ export function TodosPage() {
       <main id="main" className="page-layout">
         <TodosHeader
           disabled={todosQuery.isPending || busy}
+          completed={countCompleted(todos)}
+          total={todos.length}
           onCreate={() => setEditor('new')}
         />
         <TodoFilters

@@ -15,6 +15,7 @@ def test_creates_the_api_with_resolved_database_url_and_all_routes():
     assert paths == {
         "/api/health": {"get"},
         "/api/todos": {"get", "post"},
+        "/api/todos/stats": {"get"},
         "/api/todos/{todo_id}": {"get", "patch", "delete"},
     }
 

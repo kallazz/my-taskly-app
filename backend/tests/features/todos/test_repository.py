@@ -2,7 +2,7 @@ from datetime import date, datetime, timezone
 from unittest.mock import Mock, patch
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Session
 
@@ -33,6 +33,18 @@ def test_list_maps_models_and_orders_tasks_newest_first(model_factory, todo_valu
     assert statement.compare(expected)
     compiled = str(statement.compile(dialect=postgresql.dialect()))
     assert "ORDER BY todos.created_at DESC, todos.id DESC" in compiled
+
+
+def test_stats_counts_total_and_completed_tasks():
+    session = Mock(spec=Session)
+    session.execute.return_value.one.return_value = (5, 2)
+    stats = TodoRepository(session).stats()
+
+    statement = session.execute.call_args.args[0]
+    expected = select(func.count(TodoRecord.id), func.count(TodoRecord.id).filter(TodoRecord.completed))
+    assert statement.compare(expected)
+    assert stats.total == 5
+    assert stats.completed == 2
 
 
 def test_get_returns_none_for_missing_task():

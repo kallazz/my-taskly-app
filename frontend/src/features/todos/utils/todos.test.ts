@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  countCompleted,
   formatDate,
   isOverdue,
   priorityLabels,
@@ -154,6 +155,18 @@ describe('isOverdue', () => {
       isOverdue({ ...base, due_date: '2026-10-14', completed: true }),
     ).toBe(false)
     expect(isOverdue(base)).toBe(false)
+  })
+})
+
+describe('countCompleted', () => {
+  it('counts only completed tasks', () => {
+    expect(
+      countCompleted([
+        base,
+        { ...base, id: 2, completed: true },
+        { ...base, id: 3, completed: true },
+      ]),
+    ).toBe(2)
   })
 })
 
