@@ -1,11 +1,11 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .mappers import from_model
 from .models import TodoRecord
-from .schemas import Todo, TodoCreate, TodoUpdate
+from .schemas import Todo, TodoCreate, TodoStats, TodoUpdate
 
 
 class TodoRepository:
@@ -15,6 +15,11 @@ class TodoRepository:
     def list(self) -> list[Todo]:
         statement = select(TodoRecord).order_by(TodoRecord.created_at.desc(), TodoRecord.id.desc())
         return [from_model(record) for record in self.session.scalars(statement)]
+
+    def stats(self) -> TodoStats:
+        statement = select(func.count(TodoRecord.id), func.count(TodoRecord.id).filter(TodoRecord.completed))
+        total, completed = self.session.execute(statement).one()
+        return TodoStats(total=total, completed=completed)
 
     def get(self, todo_id: int) -> Todo | None:
         record = self.session.get(TodoRecord, todo_id)
