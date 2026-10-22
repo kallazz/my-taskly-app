@@ -184,6 +184,8 @@ def report(stack: str, result: dict) -> None:
     for path, coverage in result["coverage"].items():
         if "note" in coverage:
             print(f"  coverage {path}: {coverage['note']}")
+        elif not coverage["changed_executable_lines"]:
+            print(f"  coverage {path}: no executable lines changed (declarations or JSX markup only)")
         else:
             print(f"  coverage {path}: {coverage['changed_lines_covered']}/{coverage['changed_executable_lines']} "
                   f"changed lines covered, uncovered changed lines: {coverage['uncovered_changed_lines'] or 'none'}")

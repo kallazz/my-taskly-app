@@ -112,6 +112,8 @@ def build(run_url: str) -> tuple[str, dict]:
         for path, info in coverage.items():
             if "note" in info:
                 lines.append(f"| `{path}` | 0 | {info['note']} |")
+            elif not info["changed_executable_lines"]:
+                lines.append(f"| `{path}` | n/a | no executable lines changed (declarations or JSX markup only) |")
             else:
                 missing = ", ".join(map(str, info["uncovered_changed_lines"])) or "—"
                 lines.append(f"| `{path}` | {info['changed_lines_covered']}/{info['changed_executable_lines']} "
