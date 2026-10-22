@@ -17,3 +17,7 @@ def validate_patch_fields(model: Model) -> Model:
 
 def is_blank(value: str) -> bool:
     return not value.strip()
+
+
+def normalize_title(value: str) -> str:
+    return " ".join(value.split())
